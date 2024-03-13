@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// Define the User model with fields id, name, email, and posts
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password    String
+  token       String
+  refreshToken String
+  resetToken  String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  posts     Post[]   // One-to-many relation: One user can have multiple posts
+}
+
+// Define the Post model with fields id, title, content, published, and author
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  published Boolean  @default(false)
+  author    User     @relation(fields: [authorId], references: [id])  // Many-to-one relation: Many posts can have one author
+  authorId  Int
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  tags      Tag[]    // Many-to-many relation: Many posts can have multiple tags
+}
+
+// Define the Tag model with fields id and name
+model Tag {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  posts     Post[]   // Many-to-many relation: Many tags can be associated with multiple posts
+}
